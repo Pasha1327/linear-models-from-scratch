@@ -1,0 +1,14 @@
+image: ghcr.io/astral-sh/uv:python3.10-bookworm-slim
+
+stages:
+  - test
+
+ruff-lint-job:
+  stage: test
+  script:
+    - uvx ruff check 
+    
+pytest-job:
+  stage: test
+  script:
+    - uv run pytest
