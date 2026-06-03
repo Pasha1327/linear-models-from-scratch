@@ -1,2 +1,40 @@
-# linear-models-from-scratch
-Linear and logistic regression implemented from scratch using NumPy, without sklearn algorithms
+Предсказание выживаемости стартапов
+Модель классификации для предсказания продолжения деятельности стартапа. Данные о 65k стартапов за период 1970–2018 годов.
+Результат
+DecisionTreeClassifier — F1-score 0.974 на валидационной выборке.
+Оптимальный порог классификации: 0.55. Оптимальное число признаков: 7 (SelectKBest).
+Стек
+Python · scikit-learn · pandas · seaborn · SHAP · Optuna (OptunaSearchCV) · phik · Jupyter
+Данные
+Два файла: тренировочный (~53k) и тестовый (~13k). Признаки: название, категория, сумма финансирования, страна, регион, количество раундов, даты основания и финансирования, статус (operating / closed).
+Что сделано
+Предобработка:
+
+Заполнение пропусков (медиана по группам funding_rounds, константы для категориальных)
+Инженерия признаков: lifetime (дней существования), lifetime_category (бины по годам), first_category (основная категория из списка через |)
+Удаление выбросов: funding_total_usd > 100M, funding_rounds > 6, lifetime > 12500 — итого убрано 4.09% данных
+
+Анализ:
+
+Корреляционный анализ через phik-матрицу (для смешанных типов данных)
+Раздельные матрицы корреляции для operating и closed стартапов
+Выявленный дисбаланс классов: 90% operating / 10% closed
+
+Моделирование:
+
+Сравнение KNN, DecisionTree, LogisticRegression через OptunaSearchCV
+Pipeline: SimpleImputer + OneHotEncoder / StandardScaler через ColumnTransformer
+Кодирование целевого признака через LabelEncoder
+Отбор признаков через SelectKBest + f_classif
+Подбор порога классификации по сетке
+
+Интерпретация:
+
+SHAP beeswarm plot
+Матрица ошибок (TP=11242, FP=458, TN=759, FN=134)
+
+Бизнес-выводы:
+
+Закрытые стартапы в среднем живут ~3 года — ключевой барьер для выживания
+Топ-категории: биотехнологии, ПО, реклама, e-commerce
+Основная география: США и Западная Европа
